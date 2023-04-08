@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" class="has-navbar-fixed-top">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Book Ducks</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a href="" class="navbar-item">
+          <img src="./assets/Logo.png" alt="Book Ducks Logo" />
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="duck-navbar">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="duck-navbar" class="navbar-menu">
+        <div class="navbar-start">
+          <a href="" class="navbar-item">Books</a>
+
+          <a href="" class="navbar-item">Profile</a>
+        </div>
+        <div class="navbar-end">
+          <div class="navbar-item">
+            <div class="buttons">
+              <a href="" class="button is-primary">
+                <b>Sign Up</b>
+              </a>
+              <a href="" class="button is-light">Log In</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <section class="hero">
+      <div class="hero-body">
+        <p class="title">Books</p>
+        <p class="subtitle">Take a look at our books!</p>
+      </div>
+    </section>
+    <main class="section">
+      <div class="book-cards container">
+        <div class="columns is-centered">
+          <div class="column">
+            <div class="card">
+              <div class="center">
+                <figure class="card-image is-2b3">
+                  <img src="./assets/1984.webp" alt="1984 Book Cover Image" />
+                </figure>
+                <div class="card-header-title truncate">
+                  <h2 class="is-size-3 title">1984</h2>
+                </div>
+              </div>
+              <div class="card-content box">
+                <p>George Orwell</p>
+                <p>Pages: 328</p>
+                <p>Release Date: 6/8/1949</p>
+                <button class="button is-primary">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <div class="card">
+              <div class="center">
+                <figure class="card-image is-2b3">
+                  <img src="./assets/The Alchemist.jpg" alt="The Alchemist Book Cover Image" />
+                </figure>
+                <div class="card-header-title truncate">
+                  <h2 class="is-size-3 title">The Alchemist</h2>
+                </div>
+              </div>
+              <div class="card-content box">
+                <p>Paulo Coelho</p>
+                <p>Pages: 208</p>
+                <p>Release Date: 4/25/1988</p>
+                <button class="button is-primary">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="columns is-centered">
+          <div class="column">
+            <div class="card no-expand">
+              <div class="center">
+                <figure class="card-image is-2b3">
+                  <img src="./assets/The Fellowship Of The Rings.jpg" alt=" The Fellowship Of The Rings Book Cover Image" />
+                </figure>
+                <div class="card-header-title truncate">
+                  <h2 class="is-size-3 title">The Fellowship of the Ring</h2>
+                </div>
+              </div>
+              <div class="card-content box">
+                <p>J.R.R. Tolkien</p>
+                <p>Pages: 423</p>
+                <p>Release Date: 7/29/1954</p>
+                <button class="button is-primary">Save</button>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="card no-expand">
+              <div class="center">
+                <figure class="card-image is-2b3">
+                  <img src="./assets/The Fellowship Of The Rings.jpg" alt=" The Fellowship Of The Rings Book Cover Image" />
+                </figure>
+                <div class="card-header-title truncate">
+                  <h2 class="is-size-3 title">The Fellowship</h2>
+                </div>
+              </div>
+              <div class="card-content box">
+                <p>J.R.R. Tolkien</p>
+                <p>Pages: 423</p>
+                <p>Release Date: 7/29/1954</p>
+                <button class="button is-primary">Save</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

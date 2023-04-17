@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Book Ducks</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script src="script.js" defer></script>
   </head>
@@ -49,20 +50,16 @@
             <div class="column is-two-thirds">
               <div class="card">
                 <div class="card-content">
-                  <div class="columns">
-                    <div class="column is-three-quarters is-flex is-align-items-center">
-                      <p class="title is-2 p-2" id="username">Log in to view Profile</p>
-                    </div>
-                    <div class="column">
-                      <figure class="image is-4by3">
-                        <img src="./assets/Logo.png" alt="Profile Picture" />
-                      </figure>
+                  <div class="is-flex is-justify-content-center">
+                    <div class="is-flex is-align-items-center">
+                      <p class="title is-2 p-6 is-underlined" id="username">Log in to view Profile</p>
                     </div>
                   </div>
                   <div>
                     <div class="content">
-                      <h5 class="title is-4 center">Saved Books</h5>
-                      <div class="list is-hoverable" id="savedBooks-list"></div>
+                        <h5 class="title is-4">Saved Books</h5>
+                        <div class="list is-hoverable" id="savedBooks-list"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -72,5 +69,10 @@
         </div>
       </div>
     </section>
+    <footer class="footer">
+      <div class="content has-text-centered">
+        <p>© 2023 <b>Leo Berglund Magndahl</b>. All rights reserved.</p>
+      </div>
+    </footer>
   </body>
 </html>

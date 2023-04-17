@@ -71,6 +71,12 @@
       "relation": "manyToMany",
       "target": "api::book.book",
       "inversedBy": "users"
+    },
+    "reviews": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::review.review",
+      "mappedBy": "user"
     }
   }
 }

@@ -10301,6 +10301,13 @@ html {
   scroll-behavior: smooth;
 }
 
+.radio input[type=radio] {
+  display: none;
+}
+.radio input[type=radio]:checked ~ .icon.is-small i {
+  color: yellow;
+}
+
 #topScroll {
   width: 100%;
   height: 48px;
@@ -10320,4 +10327,10 @@ html {
 .book-cards img {
   width: 180px;
   height: 250px;
+}
+
+.loginFooter {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }/*# sourceMappingURL=style.css.map */

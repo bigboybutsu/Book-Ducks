@@ -1,10 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="has-navbar-fixed-top">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Book Ducks</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="script.js" defer></script>
   </head>
-  <body></body>
+  <body>
+    <nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand">
+        <a href="./index.html" class="navbar-item">
+          <img src="./assets/Logo.png" alt="Book Ducks Logo" />
+        </a>
+
+        <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="duck-navbar">
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+          <span aria-hidden="true"></span>
+        </a>
+      </div>
+
+      <div id="duck-navbar" class="navbar-menu">
+        <div class="navbar-start">
+          <a href="./index.html" class="navbar-item">Books</a>
+
+          <a href="./profile.html" class="navbar-item">Profile</a>
+        </div>
+        <div class="navbar-end" id="loginBtns">
+          <div class="navbar-item">
+            <div class="buttons">
+              <!-- <a href="" class="button is-primary">
+                <b>Sign Up</b>
+              </a>
+              <a href="" class="button is-light">Log In</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
+    <div id="topScroll"></div>
+    <main>
+      <div id="login-container">
+        <div class="center">
+          <div class="card" id="login-card">
+            <div class="card-content">
+              <div class="content">
+                <h2>Login</h2>
+                <form id="login-form" onsubmit="return validateLoginForm()">
+                  <div class="field">
+                    <label class="label">Username</label>
+                    <div class="control">
+                      <input class="input" type="text" id="username" placeholder="Username" />
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control">
+                      <input class="input" type="password" id="password" placeholder="Password" />
+                    </div>
+                  </div>
+                  <div class="field">
+                    <div class="control">
+                      <button class="button is-primary" id="login-btn" type="submit">Login</button>
+                      <button class="button is-link" type="button" onclick="printSignup()">Sign Up</button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
 </html>

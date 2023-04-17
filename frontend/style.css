@@ -10284,12 +10284,39 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
   padding: 3rem 1.5rem 6rem;
 }
 
+#login-card {
+  width: 350px;
+}
+
+#signup-card {
+  width: 350px;
+}
+
+#savedBooks-list img {
+  width: 64px;
+}
+
 /* CUSTOM STYLING */
-.book-cards .center {
+html {
+  scroll-behavior: smooth;
+}
+
+#topScroll {
+  width: 100%;
+  height: 48px;
+}
+
+.hidden {
+  display: none;
+}
+
+.center {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 15px;
 }
+
 .book-cards img {
   width: 180px;
   height: 250px;

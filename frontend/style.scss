@@ -5,6 +5,8 @@
 
 // Import a Google Font
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+@import "./log-in";
+@import "./profile";
 // Set your brand colors
 $purple: #9b0067;
 $pink: #fa7c91;
@@ -40,12 +42,26 @@ $input-shadow: none;
 
 /* CUSTOM STYLING */
 
+html {
+  scroll-behavior: smooth;
+}
+
+#topScroll{
+  width: 100%;
+  height: 48px;
+}
+
+.hidden{
+  display: none;
+}
+
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+}
 .book-cards {
-  .center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
   img {
     width: 180px;
     height: 250px;

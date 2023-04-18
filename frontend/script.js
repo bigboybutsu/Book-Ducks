@@ -1,7 +1,5 @@
 /* GENERAL VARIABLES */
 
-let userData;
-
 /* HAMBURGER MENU */
 document.addEventListener("DOMContentLoaded", () => {
   // Get all "navbar-burger" elements
@@ -24,72 +22,116 @@ document.addEventListener("DOMContentLoaded", () => {
 /* LOGIN PAGE */
 let loginContainer = document.querySelector("#login-container");
 let signupCard = document.querySelector("#signup-card");
-let signupBtn = document.querySelector("#signup-btn");
+let signupBtn = document.querySelector("#signupBtn");
 
 const loginForm = document.querySelector("#login-form");
 if (loginForm) {
   loginForm.addEventListener("submit", async function (event) {
     event.preventDefault();
-    await getUserLoginAuth();
+    let username = document.querySelector("#username").value;
+    let password = document.querySelector("#password").value;
+    console.log(password);
+    if (password.length >= 6) {
+      await getUserLoginAuth(username, password);
+    }
   });
 }
 
 function validateLoginForm() {
-  const username = document.getElementById("username").value.trim();
-  const password = document.getElementById("password").value.trim();
+  const username = document.getElementById("username").value;
+  const password = document.getElementById("password").value;
 
   if (username === "" || password === "") {
     alert("Please fill in both fields.");
+    return false;
+  } else if (password.length < 6) {
+    alert("Password must be longer than 6 characters");
     return false;
   } else {
     return true;
   }
 }
 
-function printSignup() {
-  if (loginContainer) {
-    loginContainer.classList.toggle("hidden");
-  }
+function validateRegisterForm() {
+  const username = document.querySelector("#regUsername").value;
+  const email = document.querySelector("#regEmail").value;
+  const password = document.querySelector("#regPassword").value;
 
-  let main = document.querySelector("main");
-  let div = document.createElement("div");
-  div.classList.add("center");
-  div.innerHTML = `
-  <div class="card" id="signup-card">
-        <div class="card-content">
-          <div class="content">
-            <h2>Signup</h2>
-            <form>
-              <div class="field">
-                <label class="label">Username</label>
-                <div class="control">
-                  <input class="input" type="text" placeholder="Username" />
+  if (username === "" || password === "" || email === "") {
+    alert("Please fill all both fields.");
+    return false;
+  } else if (password.length < 6) {
+    alert("Password must be longer than 6 characters");
+    return false;
+  } else {
+    return true;
+  }
+}
+
+if (signupBtn) {
+  signupBtn.addEventListener("click", (event) => {
+    event.preventDefault(); // prevent the default behavior of the link
+    window.location.href = "./log-in.html?signup=true"; // redirect to log-in.html with a query parameter
+  });
+}
+
+function printSignup() {
+  const queryParams = new URLSearchParams(window.location.search);
+  if (queryParams.get("signup") === "true") {
+    if (loginContainer) {
+      loginContainer.classList.toggle("hidden");
+    }
+
+    let main = document.querySelector("main");
+    let div = document.createElement("div");
+    div.classList.add("center");
+    div.innerHTML = `
+    <div class="card" id="signup-card">
+          <div class="card-content">
+            <div class="content">
+              <h2>Register your account</h2>
+              <form id="register-form" onsubmit="return validateRegisterForm()">
+                <div class="field">
+                  <label class="label">Username</label>
+                  <div class="control">
+                    <input class="input" type="text" placeholder="Username" id="regUsername"/>
+                  </div>
                 </div>
-              </div>
-              <div class="field">
-                <label class="label">Email</label>
-                <div class="control">
-                  <input class="input" type="email" placeholder="Email" />
+                <div class="field">
+                  <label class="label">Email</label>
+                  <div class="control">
+                    <input class="input" type="email" placeholder="Email" id="regEmail"/>
+                  </div>
                 </div>
-              </div>
-              <div class="field">
-                <label class="label">Password</label>
-                <div class="control">
-                  <input class="input" type="password" placeholder="Password" />
+                <div class="field">
+                  <label class="label">Password</label>
+                  <div class="control">
+                    <input class="input" type="password" placeholder="Password" id="regPassword"/>
+                  </div>
                 </div>
-              </div>
-              <div class="field">
-                <div class="control">
-                  <button class="button is-link" id="signup-btn">Signup</button>
+                <div class="field">
+                  <div class="control">
+                    <button type="submit" class="button is-link" id="signup-btn">Signup</button>
+                  </div>
                 </div>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-  `;
-  main.append(div);
+    `;
+    main.append(div);
+    const registerForm = document.querySelector("#register-form");
+    registerForm.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      let password = document.querySelector("#regPassword").value;
+
+      if (password.length >= 6) {
+        await signUpUser();
+      }
+    });
+  }
 }
+window.addEventListener("load", printSignup);
 
 function removeLoginBtns() {
   if (sessionStorage.getItem("token")) {
@@ -111,7 +153,7 @@ function removeLoginBtns() {
     `;
     let userText = document.createElement("div");
     userText.innerHTML = `
-    <p style="margin-bottom: 0.5rem;" class="navbar-item is-size-6 title">${username}</p>
+    <a href="./profile.html" style="margin-bottom: 0.5rem;" class="navbar-item is-size-6 title">${username}</a>
     `;
 
     document.querySelector(".buttons").append(userText, logoutBtn);
@@ -142,7 +184,6 @@ async function toggleSaved(bookId, save) {
   } else {
     newBooks = userData2.books.filter((book) => book.id !== bookId);
   }
-  console.log(newBooks);
 
   const updateUserResponse = await axios.put(
     `http://localhost:1337/api/users/${userId}`,
@@ -189,12 +230,14 @@ function updateSaveBtn(bookId, save) {
 
 async function saveBtn() {
   let userData = await getUserInfo();
-  const userBooks = userData.books;
-  let userBooksIds = userBooks.map((book) => book.id);
-  // console.log(userBooksIds);
-  userBooksIds.forEach((bookId) => {
-    updateSaveBtn(bookId, true);
-  });
+  if (userData != undefined) {
+    const userBooks = userData.books;
+    let userBooksIds = userBooks.map((book) => book.id);
+    // console.log(userBooksIds);
+    userBooksIds.forEach((bookId) => {
+      updateSaveBtn(bookId, true);
+    });
+  }
 }
 
 /* LOAD BOOKS */
@@ -267,36 +310,57 @@ function changeStarColor(el) {
   }
 }
 
+function averageRating(bookArray) {
+  let totalAvg = [];
+  bookArray.forEach((book, i) => {
+    const { reviews: review } = book;
+    let reviews = review;
+    let ratingSum = 0;
+
+    reviews.forEach((rating) => {
+      rating.rating;
+      ratingSum += rating.rating;
+    });
+
+    let ratingAvg = ratingSum / reviews.length;
+    ratingAvg = Math.round(ratingAvg * 10) / 10; // limit to one decimal place
+    totalAvg.push(ratingAvg);
+  });
+  return totalAvg;
+}
+
 async function ratingBtns() {
   let userData = await getUserInfo();
 
-  let userId = parseInt(sessionStorage.getItem("userId"));
-  if (document.querySelector("#book-cards")) {
-    const userReviews = userData.reviews;
-    userReviews.forEach((review) => {
-      const reviewRating = review.rating;
-      const bookId = review.book.id;
-      let parentNode = document.querySelector(`#book_${bookId}_ratings`);
-      let input = parentNode.querySelector(`input[value='${reviewRating}']`);
-      changeStarColor(input);
-    });
-  } else if (document.querySelector("#profile-card")) {
-    const userReviews = userData.books;
-    userReviews.forEach((user) => {
-      user.reviews.forEach((review) => {
-        if (review.user.id === userId) {
-          const reviewRating = review.rating;
-          const bookId = review.book.id;
-          let parentNode = document.querySelector(`#book_${bookId}_ratings`);
-          let input = parentNode.querySelector(`input[value='${reviewRating}']`);
-          changeStarColor(input);
-        }
+  if (userData != undefined) {
+    let userId = parseInt(sessionStorage.getItem("userId"));
+    if (document.querySelector("#book-cards")) {
+      const userReviews = userData.reviews;
+      userReviews.forEach((review) => {
+        const reviewRating = review.rating;
+        const bookId = review.book.id;
+        let parentNode = document.querySelector(`#book_${bookId}_ratings`);
+        let input = parentNode.querySelector(`input[value='${reviewRating}']`);
+        changeStarColor(input);
       });
-    });
+    } else if (document.querySelector("#profile-card")) {
+      const userReviews = userData.books;
+      userReviews.forEach((user) => {
+        user.reviews.forEach((review) => {
+          if (review.user.id === userId) {
+            const reviewRating = review.rating;
+            const bookId = review.book.id;
+            let parentNode = document.querySelector(`#book_${bookId}_ratings`);
+            let input = parentNode.querySelector(`input[value='${reviewRating}']`);
+            changeStarColor(input);
+          }
+        });
+      });
+    }
   }
 }
 
-function bookDivStructure(image, title, author, pages, releaseDate, bookId) {
+function bookDivStructure(image, title, author, pages, releaseDate, bookId, ratingAvg) {
   let div = document.createElement("div");
   div.classList.add("column");
   if (sessionStorage.getItem("token")) {
@@ -354,6 +418,7 @@ function bookDivStructure(image, title, author, pages, releaseDate, bookId) {
                   <i class="fas fa-star fa-s"></i>
                 </span>
               </label>
+              <div><span><b>Average rating: ${ratingAvg}</b></span></div>
             </div>
           </div>
         </div>
@@ -381,124 +446,189 @@ function bookDivStructure(image, title, author, pages, releaseDate, bookId) {
   return div;
 }
 
-async function loadBooks() {
-  let books = await getItems("http://localhost:1337/api/books?populate=deep,3");
-  let bookArray = books.data.data;
-  // console.log(books.data.data);
-  // console.log(bookArray);
-  for (let i = 0; i < bookArray.length; i += 2) {
+function bookRender(books, auth) {
+  if (auth) {
     const {
-      attributes: { title: title1, pages: pages1, author: author1, releaseDate: releaseDate1, coverImage: coverImage1 },
-    } = bookArray[i];
-    let id1 = bookArray[i].id;
-    // console.log(bookArray[i + 1].id);
-    const image1 = coverImage1.data.attributes.url;
-    const card1 = bookDivStructure(image1, title1, author1, pages1, releaseDate1, id1);
+      attributes: { title: title, pages: pages, author: author, releaseDate: releaseDate, coverImage: coverImage, reviews: review },
+    } = books;
+    let id = books.id;
+    const avgRating = review.data;
 
-    const { attributes: { title: title2, pages: pages2, author: author2, releaseDate: releaseDate2, coverImage: coverImage2 } = {} } =
-      bookArray[i + 1] || {};
-    let id2 = bookArray[i + 1].id;
-    const image2 = coverImage2?.data?.attributes?.url;
-    const card2 = bookDivStructure(image2, title2, author2, pages2, releaseDate2, id2);
+    let ratingSum = 0;
+    avgRating.forEach((rating) => {
+      rating.attributes.rating;
+      ratingSum += rating.attributes.rating;
+    });
+    let ratingAvg = ratingSum / avgRating.length;
+    ratingAvg = Math.round(ratingAvg * 10) / 10;
+    // console.log(i, ratingAvg1);
 
-    const columns = document.createElement("div");
-    columns.classList.add("columns", "is-centered");
-    columns.appendChild(card1);
-    if (card2) columns.appendChild(card2);
+    const image = coverImage.data.attributes.url;
+    const card = bookDivStructure(image, title, author, pages, releaseDate, id, ratingAvg);
+    return card;
+  } else {
+    const {
+      attributes: { title: title, pages: pages, author: author, releaseDate: releaseDate, coverImage: coverImage, reviews: review },
+    } = books;
+    let id = books.id;
+    // console.log(books);
+    const image = coverImage.data.attributes.url;
 
-    const container = document.querySelector(".book-cards");
-
-    container.appendChild(columns);
+    let card = bookDivStructure(image, title, author, pages, releaseDate, id);
+    // console.log("card: ", card);
+    return card;
   }
+}
+
+function renderColumns(card, index) {
+  if (index % 2 === 0) {
+    // create new row for every even-numbered index
+    const row = document.createElement("div");
+    row.classList.add("columns", "is-centered");
+    const container = document.querySelector(".book-cards");
+    container.appendChild(row);
+  }
+
+  // append card to the last row in the container
+  const rows = document.querySelectorAll(".columns");
+  const lastRow = rows[rows.length - 1];
+  lastRow.appendChild(card);
+}
+
+async function loadBooks() {
+  let authBooksArr;
+  let publicBooksArr;
+  if (sessionStorage.getItem("token")) {
+    let auth = true;
+    let authBooks = await axios.get("http://localhost:1337/api/books?populate=deep,3", {
+      headers: {
+        Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+      },
+    });
+    authBooksArr = authBooks.data.data;
+    authBooksArr.forEach((book, index) => {
+      let card = bookRender(book, auth);
+      renderColumns(card, index);
+    });
+  } else {
+    let auth = false;
+    let publicBooks = await getItems("http://localhost:1337/api/books?populate=deep,3");
+    publicBooksArr = publicBooks.data.data;
+    publicBooksArr.forEach((book, index) => {
+      let card = bookRender(book, auth);
+      renderColumns(card, index);
+    });
+  }
+
   saveBtn();
   ratingBtns();
 }
+// averageRating();
 
 /* PROFILE PAGE */
 
 async function renderProfile() {
   let user = await getUserInfo();
-
-  let username = document.querySelector("#username");
-  username.innerText = user.username.charAt(0).toUpperCase() + user.username.slice(1);
-
   let saveBooksList = document.querySelector("#savedBooks-list");
 
-  let books = user.books;
-  books.forEach((book) => {
-    let { title, pages, author, releaseDate, coverImage, id } = book;
-    let bookId = id;
-    const image = coverImage.url;
-    let div = document.createElement("div");
-    div.classList.add("box");
-    div.innerHTML = `
-    <div class="list-item">
-      <div class="columns">
-        <div class="column is-one-third">
-          <figure class="image is-2b3">
-            <img src="http://localhost:1337${image}" alt="1984 Book Cover Image"/>
-          </figure>
-        </div>
-        <div class="column">
-          <div class="card-header-title">
-            <h2 class="is-size-5 title">${title}</h2>
-          </div>
-        </div>
-      </div>
-      <div class="media-content">
-        <p>Author: ${author}</p>
-        <p>Pages: ${pages}</p>
-        <p>Release Date: ${releaseDate}</p>
-        <button class="button is-primary" onclick="toggleSaved(${bookId}, true)" id="saveBtn_${bookId}">
-            <span class="icon is-small">
-              <i class="fas fa-bookmark"></i>
-            </span>
-            <span>
-              Save
-            </span>
-          </button>
-          <div class="field">
-            <div class="control has-text-centered" id="book_${bookId}_ratings">
-              <label class="radio">
-                <input type="radio" name="rating" value="1" onclick="ratings(this, ${bookId})">
-                <span class="icon is-small">
-                  <i class="fas fa-star fa-s"></i>
-                </span>
-              </label>
-              <label class="radio">
-                <input type="radio" name="rating" value="2" onclick="ratings(this, ${bookId})">
-                <span class="icon is-small">
-                  <i class="fas fa-star fa-s"></i>
-                </span>
-              </label>
-              <label class="radio">
-                <input type="radio" name="rating" value="3" onclick="ratings(this, ${bookId})">
-                <span class="icon is-small">
-                  <i class="fas fa-star fa-s"></i>
-                </span>
-              </label>
-              <label class="radio">
-                <input type="radio" name="rating" value="4" onclick="ratings(this, ${bookId})">
-                <span class="icon is-small">
-                  <i class="fas fa-star fa-s"></i>
-                </span>
-              </label>
-              <label class="radio">
-                <input type="radio" name="rating" value="5" onclick="ratings(this, ${bookId})">
-                <span class="icon is-small">
-                  <i class="fas fa-star fa-s"></i>
-                </span>
-              </label>
-            </div>
-          </div>
-      </div>
-    </div>
-    `;
+  if (sessionStorage.getItem("token")) {
+    let username = document.querySelector("#username");
+    username.innerText = "Welcome! " + user.username.charAt(0).toUpperCase() + user.username.slice(1);
 
-    saveBooksList.append(div);
-  });
-  saveBtn();
-  ratingBtns();
+    let books = user.books;
+    let ratingAvg = averageRating(books);
+
+    books.forEach((book, i) => {
+      let { title, pages, author, releaseDate, coverImage, id } = book;
+      let bookId = id;
+      const image = coverImage.url;
+      let div = document.createElement("div");
+      div.classList.add("box");
+      div.innerHTML = `
+      <div class="list-item">
+        <div class="columns">
+          <div class="column is-one-third">
+            <figure class="image is-2b3 img-no-margin">
+              <img src="http://localhost:1337${image}" alt="1984 Book Cover Image"/>
+            </figure>
+          </div>
+          <div class="column">
+            <div class="card-header-title">
+              <h2 class="is-size-3 title">${title}</h2>
+            </div>
+            <div class="media-content">
+          <p>Author: ${author}</p>
+          <p>Pages: ${pages}</p>
+          <p>Release Date: ${releaseDate}</p>
+          <button class="button is-primary" onclick="toggleSaved(${bookId}, true)" id="saveBtn_${bookId}">
+              <span class="icon is-small">
+                <i class="fas fa-bookmark"></i>
+              </span>
+              <span>
+                Save
+              </span>
+            </button>
+            <div class="field pt-3">
+              <div class="control has-text-centered" id="book_${bookId}_ratings">
+                <label class="radio">
+                  <input type="radio" name="rating" value="1" onclick="ratings(this, ${bookId})">
+                  <span class="icon is-small">
+                    <i class="fas fa-star fa-s"></i>
+                  </span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="rating" value="2" onclick="ratings(this, ${bookId})">
+                  <span class="icon is-small">
+                    <i class="fas fa-star fa-s"></i>
+                  </span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="rating" value="3" onclick="ratings(this, ${bookId})">
+                  <span class="icon is-small">
+                    <i class="fas fa-star fa-s"></i>
+                  </span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="rating" value="4" onclick="ratings(this, ${bookId})">
+                  <span class="icon is-small">
+                    <i class="fas fa-star fa-s"></i>
+                  </span>
+                </label>
+                <label class="radio">
+                  <input type="radio" name="rating" value="5" onclick="ratings(this, ${bookId})">
+                  <span class="icon is-small">
+                    <i class="fas fa-star fa-s"></i>
+                  </span>
+                </label>
+                <div><span><b>Average rating: ${ratingAvg[i]}</b></span></div>
+              </div>
+            </div>
+        </div>
+          </div>
+        </div>
+        
+      </div>
+      `;
+
+      saveBooksList.append(div);
+    });
+
+    if (saveBooksList.innerHTML === "") {
+      let p = document.createElement("p");
+      p.innerText = "Looks a little empty here! Add some books by clicking the save button on the book page!";
+      saveBooksList.append(p);
+    }
+
+    saveBtn();
+    ratingBtns();
+    // averageRating2();
+  } else if (!sessionStorage.getItem("token")) {
+    if (saveBooksList.innerHTML === "") {
+      let p = document.createElement("p");
+      p.innerText = "Looks a little empty here! Log in to save some books!";
+      saveBooksList.append(p);
+    }
+  }
 }
 
 /* FETCHES WITH AXIOS */
@@ -521,19 +651,42 @@ async function loadPage() {
   }
 }
 
-async function getUserLoginAuth() {
-  let username = document.querySelector("#username");
-  let password = document.querySelector("#password");
+async function signUpUser() {
+  const username = document.querySelector("#regUsername").value;
+  const email = document.querySelector("#regEmail").value;
+  const password = document.querySelector("#regPassword").value;
+
+  const registerUser = {
+    username: username,
+    email: email,
+    password: password,
+  };
+  console.log(registerUser);
+  try {
+    const response = await axios.post("http://localhost:1337/api/auth/local/register", registerUser);
+    console.log(response.data); // logs the created user object
+    try {
+      await getUserLoginAuth(username, password);
+    } catch (error) {
+      console.error(error);
+    }
+    return response.data; // returns the created user object
+  } catch (error) {
+    console.error(error);
+    return null; // or handle the error appropriately
+  }
+}
+
+async function getUserLoginAuth(username, password) {
   try {
     let response = await axios.post("http://localhost:1337/api/auth/local", {
-      identifier: username.value,
-      password: password.value,
+      identifier: username,
+      password: password,
     });
     sessionStorage.setItem("token", response.data.jwt);
     sessionStorage.setItem("username", response.data.user.username);
     sessionStorage.setItem("userId", response.data.user.id);
-    alert("Logged in!");
-    window.location.href = "index.html";
+    window.location.href = "profile.html";
   } catch (error) {
     if (error.response) {
       alert("Wrong password or username.");
@@ -550,7 +703,6 @@ async function getUserInfo() {
         Authorization: `Bearer ${sessionStorage.getItem("token")}`,
       },
     });
-    userData = response.data;
     return response.data;
   }
 }

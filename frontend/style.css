@@ -2,7 +2,7 @@
 /* BASIC FUNCTIONALIY REQUIREMENT */
 /*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
 /* Bulma Utilities */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Patua+One&family=Poppins:wght@300;400;500;600&display=swap");
 .pagination-previous,
 .pagination-next,
 .pagination-link,
@@ -10292,8 +10292,12 @@ a.has-text-danger-dark:hover, a.has-text-danger-dark:focus {
   width: 350px;
 }
 
+#savedBooks-list .img-no-margin {
+  margin-left: 0;
+  margin-right: 0;
+}
 #savedBooks-list img {
-  width: 64px;
+  width: 200px;
 }
 
 /* CUSTOM STYLING */

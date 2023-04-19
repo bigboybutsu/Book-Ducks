@@ -1,53 +1,5 @@
 @charset "UTF-8";
 /* BASIC FUNCTIONALIY REQUIREMENT */
-/* LIGHT THEME */
-/* LIGHT THEME END */
-/*
-.light-theme {
-  --primary-color: #a72b7d;
-  --secondary-color: #6f72ff;
-  --dark-color: #4a4a4a;
-  --light-color: #d0d1cd;
-  --lighter-color: #ffffff;
-  --grey-dark: #4a4a4a;
-  --grey-light: #d0d1cd;
-  --primary: #a72b7d;
-  --link: #6f72ff;
-  --body-background-color: var(--lighter-color);
-  --input-border-color: transparent;
-  --input-shadow: none;
-}
-
-.dark-theme {
-  --primary-color: #c26417;
-  --secondary-color: #6f72ff;
-  --dark-color: #f0f0f0;
-  --light-color: #d0d1cd;
-  --lighter-color: #181818;
-  --title-color: #f0f0f0;
-  --grey-dark: #f0f0f0;
-  --grey-light: #d0d1cd;
-  --primary: #c26417;
-  --link: #6f72ff;
-  --body-background-color: var(--lighter-color);
-  --input-border-color: transparent;
-  --input-shadow: none;
-  --card-background-color: #3a3a3a;
-  --card-shadow: 0 0.5em 1em -0.125em rgba(255, 255, 255, 0.1), 0 0px 0 1px rgba(255, 255, 255, 0.02);
-  --content-heading-color: #f0f0f0;
-  --label-color: #f0f0f0;
-  --input-placeholder-color: #838383;
-  --input-background-color: #d8d8d8;
-  --input-color: #3d3d3d;
-  --navbar-background-color: #181818;
-  --navbar-box-shadow-size: 0 2px 0 0;
-  --navbar-box-shadow-color: #bdbdbd;
-  --navbar-item-hover-color: #f0f0f0;
-  --navbar-item-hover-background-color: #333333;
-  --box-background-color: #6b6b6b;
-  --footer-background-color: rgb(26, 26, 26);
-}
-*/
 /*! bulma.io v0.9.4 | MIT License | github.com/jgthms/bulma */
 /* Bulma Utilities */
 @import url("https://fonts.googleapis.com/css2?family=Patua+One&family=Poppins:wght@300;400;500;600&display=swap");
@@ -2756,7 +2708,7 @@ a.tag:hover {
 /* Bulma Form */
 .select select, .textarea, .input {
   background-color: hsl(0, 0%, 100%);
-  border-color: hsl(0, 0%, 86%);
+  border-color: transparent;
   border-radius: 4px;
   color: hsl(0, 0%, 21%);
 }
@@ -2799,7 +2751,7 @@ a.tag:hover {
 }
 
 .textarea, .input {
-  box-shadow: inset 0 0.0625em 0.125em rgba(10, 10, 10, 0.05);
+  box-shadow: none;
   max-width: 100%;
   width: 100%;
 }

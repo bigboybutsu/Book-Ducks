@@ -1,0 +1,19 @@
+{
+  "kind": "singleType",
+  "collectionName": "change_themes",
+  "info": {
+    "singularName": "change-theme",
+    "pluralName": "change-themes",
+    "displayName": "changeTheme",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "darkmodeTheme": {
+      "type": "boolean"
+    }
+  }
+}

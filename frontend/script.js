@@ -149,7 +149,7 @@ function removeLoginBtns() {
     username = username.charAt(0).toUpperCase() + username.slice(1);
     let logoutBtn = document.createElement("div");
     logoutBtn.innerHTML = `
-    <a href="./log-in.html" class="button is-light" id="loginBtn">Log Out</a>
+    <a href="./log-in.html" class="button is-accent" id="loginBtn">Log Out</a>
     `;
     let userText = document.createElement("div");
     userText.innerHTML = `
@@ -202,29 +202,29 @@ async function toggleSaved(bookId, save) {
 }
 
 function updateSaveBtn(bookId, save) {
-  let btn = document.querySelector(`#saveBtn_${bookId}`);
-  if (save) {
-    btn.innerText = "Saved";
-    btn.classList.add("is-active");
-    btn.innerHTML = `
-    <span class="icon is-small">
-      <i class="fas fa-check"></i>
-    </span>
-    <span>Saved</span>
+  let ratedBtn = document.querySelector(`#rated_saveBtn_${bookId}`);
+  let saveBtn = document.querySelector(`#saveBtn_${bookId}`);
+
+  if (ratedBtn) {
+    ratedBtn.classList.toggle("is-active", save);
+    ratedBtn.innerHTML = `
+      <span class="icon is-small">
+        <i class="fas ${save ? "fa-check" : "fa-bookmark"}"></i>
+      </span>
+      <span>${save ? "Saved" : "Save"}</span>
     `;
-    btn.removeAttribute("onclick");
-    btn.setAttribute("onclick", `toggleSaved(${bookId}, false)`);
-  } else {
-    btn.innerText = "Save";
-    btn.classList.remove("is-active");
-    btn.innerHTML = `
-    <span class="icon is-small">
-      <i class="fas fa-bookmark"></i>
-    </span>
-    <span>Save</span>
+    ratedBtn.onclick = () => toggleSaved(bookId, !save);
+  }
+
+  if (saveBtn) {
+    saveBtn.classList.toggle("is-active", save);
+    saveBtn.innerHTML = `
+      <span class="icon is-small">
+        <i class="fas ${save ? "fa-check" : "fa-bookmark"}"></i>
+      </span>
+      <span>${save ? "Saved" : "Save"}</span>
     `;
-    btn.removeAttribute("onclick");
-    btn.setAttribute("onclick", `toggleSaved(${bookId}, true)`);
+    saveBtn.onclick = () => toggleSaved(bookId, !save);
   }
 }
 
@@ -273,7 +273,7 @@ async function ratings(el, bookId) {
         Authorization: `Bearer ${authToken}`,
       },
     });
-    console.log(updateReviewResponse.data);
+    // console.log(updateReviewResponse.data);
   } else {
     // user has not left a review for this book, create a new review
     const newReview = {
@@ -331,11 +331,12 @@ function averageRating(bookArray) {
 
 async function ratingBtns() {
   let userData = await getUserInfo();
+  // console.log(userData);
 
+  const userReviews = userData.reviews;
   if (userData != undefined) {
     let userId = parseInt(sessionStorage.getItem("userId"));
     if (document.querySelector("#book-cards")) {
-      const userReviews = userData.reviews;
       userReviews.forEach((review) => {
         const reviewRating = review.rating;
         const bookId = review.book.id;
@@ -344,17 +345,19 @@ async function ratingBtns() {
         changeStarColor(input);
       });
     } else if (document.querySelector("#profile-card")) {
-      const userReviews = userData.books;
-      userReviews.forEach((user) => {
-        user.reviews.forEach((review) => {
-          if (review.user.id === userId) {
-            const reviewRating = review.rating;
-            const bookId = review.book.id;
-            let parentNode = document.querySelector(`#book_${bookId}_ratings`);
-            let input = parentNode.querySelector(`input[value='${reviewRating}']`);
-            changeStarColor(input);
-          }
-        });
+      userReviews.forEach((review) => {
+        const reviewRating = review.rating;
+        const bookId = review.book.id;
+        let parentNodeSaved = document.querySelector(`#book_${bookId}_ratings`);
+        let parentNodeRated = document.querySelector(`#rated_book_${bookId}_ratings`);
+        if (parentNodeSaved) {
+          let input = parentNodeSaved.querySelector(`input[value='${reviewRating}']`);
+          changeStarColor(input);
+        }
+        if (parentNodeRated) {
+          let input = parentNodeRated.querySelector(`input[value='${reviewRating}']`);
+          changeStarColor(input);
+        }
       });
     }
   }
@@ -527,90 +530,222 @@ async function loadBooks() {
 
 /* PROFILE PAGE */
 
-async function renderProfile() {
-  let user = await getUserInfo();
-  let saveBooksList = document.querySelector("#savedBooks-list");
+function savedBooksCard(image, title, author, pages, releaseDate, bookId, ratingAvg, i) {
+  let div = `
+  <div class="list-item">
+    <div class="columns">
+      <div class="column is-one-third">
+        <figure class="image is-2b3 img-no-margin">
+          <img src="http://localhost:1337${image}" alt="1984 Book Cover Image"/>
+        </figure>
+      </div>
+      <div class="column">
+        <div class="card-header-title">
+          <h2 class="is-size-5 title">${title}</h2>
+        </div>
+      <div class="media-content">
+        <div class="pl-4">
+          <p>Author: ${author}</p>
+          <p>Pages: ${pages}</p>
+          <p>Release Date: ${releaseDate}</p>
+          <button class="button is-primary" onclick="toggleSaved(${bookId}, true)" id="saveBtn_${bookId}">
+            <span class="icon is-small">
+              <i class="fas fa-bookmark"></i>
+            </span>
+            <span>
+              Save
+            </span>
+          </button>
+        </div>
+          <div class="field pt-3">
+            <div class="control has-text-centered" id="book_${bookId}_ratings">
+              <label class="radio">
+                <input type="radio" name="rating" value="1" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="2" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="3" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="4" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="5" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <div><span><b>Average rating: ${ratingAvg[i]}</b></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+  `;
+  return div;
+}
+function ratedBooksCard(image, title, author, pages, releaseDate, bookId, ratingAvg, i) {
+  let div = `
+  <div class="list-item">
+    <div class="columns">
+      <div class="column is-one-third">
+        <figure class="image is-2b3 img-no-margin">
+          <img src="http://localhost:1337${image}" alt="1984 Book Cover Image"/>
+        </figure>
+      </div>
+      <div class="column">
+        <div class="card-header-title">
+          <h2 class="is-size-5 title">${title}</h2>
+        </div>
+      <div class="media-content">
+        <div class="pl-4">
+          <p>Author: ${author}</p>
+          <p>Pages: ${pages}</p>
+          <p>Release Date: ${releaseDate}</p>  
+          <button class="button is-primary" onclick="toggleSaved(${bookId}, true)" id="rated_saveBtn_${bookId}">
+            <span class="icon is-small">
+              <i class="fas fa-bookmark"></i>
+            </span>
+            <span>
+              Save
+            </span>
+          </button>
+        </div>
+          <div class="field pt-3">
+            <div class="control has-text-centered" id="rated_book_${bookId}_ratings">
+              <label class="radio">
+                <input type="radio" name="rating" value="1" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="2" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="3" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="4" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <label class="radio">
+                <input type="radio" name="rating" value="5" onclick="ratings(this, ${bookId})">
+                <span class="icon is-small">
+                  <i class="fas fa-star fa-s"></i>
+                </span>
+              </label>
+              <div><span><b>Average rating: ${ratingAvg[i]}</b></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div> 
+  </div>
+  `;
+  return div;
+}
 
+function dropDownActive(user) {
+  // Get all the dropdown items
+  var dropdownItems = document.querySelectorAll(".dropdown-item");
+  let selectedValue;
+  // Loop through each dropdown item
+  dropdownItems.forEach(function (item) {
+    // Add a click event listener to the item
+    item.addEventListener("click", function () {
+      // Remove the "is-active" class from all dropdown items
+      dropdownItems.forEach(function (item) {
+        item.classList.remove("is-active");
+      });
+      // Add the "is-active" class to the clicked dropdown item
+      this.classList.add("is-active");
+      selectedValue = this.getAttribute("data-value");
+      let ratedBooksList = document.querySelector("#ratedBooks-list");
+      let saveBooksList = document.querySelector("#savedBooks-list");
+      saveBooksList.innerHTML = "";
+      ratedBooksList.innerHTML = "";
+      printProfile(user, selectedValue);
+    });
+  });
+}
+
+function printProfile(user, dropdownValue) {
+  let saveBooksList = document.querySelector("#savedBooks-list");
+  let ratedBooksList = document.querySelector("#ratedBooks-list");
   if (sessionStorage.getItem("token")) {
     let username = document.querySelector("#username");
     username.innerText = "Welcome! " + user.username.charAt(0).toUpperCase() + user.username.slice(1);
 
-    let books = user.books;
-    let ratingAvg = averageRating(books);
+    let savedBooks = user.books;
+    let reviews = user.reviews;
+    let ratedBooks = reviews.map((review) => review.book);
+    let savedRatingAvg = averageRating(savedBooks);
+    let ratedRatingAvg = averageRating(ratedBooks);
 
-    books.forEach((book, i) => {
+    savedBooks.forEach((book, i) => {
       let { title, pages, author, releaseDate, coverImage, id } = book;
       let bookId = id;
       const image = coverImage.url;
       let div = document.createElement("div");
       div.classList.add("box");
-      div.innerHTML = `
-      <div class="list-item">
-        <div class="columns">
-          <div class="column is-one-third">
-            <figure class="image is-2b3 img-no-margin">
-              <img src="http://localhost:1337${image}" alt="1984 Book Cover Image"/>
-            </figure>
-          </div>
-          <div class="column">
-            <div class="card-header-title">
-              <h2 class="is-size-3 title">${title}</h2>
-            </div>
-            <div class="media-content">
-          <p>Author: ${author}</p>
-          <p>Pages: ${pages}</p>
-          <p>Release Date: ${releaseDate}</p>
-          <button class="button is-primary" onclick="toggleSaved(${bookId}, true)" id="saveBtn_${bookId}">
-              <span class="icon is-small">
-                <i class="fas fa-bookmark"></i>
-              </span>
-              <span>
-                Save
-              </span>
-            </button>
-            <div class="field pt-3">
-              <div class="control has-text-centered" id="book_${bookId}_ratings">
-                <label class="radio">
-                  <input type="radio" name="rating" value="1" onclick="ratings(this, ${bookId})">
-                  <span class="icon is-small">
-                    <i class="fas fa-star fa-s"></i>
-                  </span>
-                </label>
-                <label class="radio">
-                  <input type="radio" name="rating" value="2" onclick="ratings(this, ${bookId})">
-                  <span class="icon is-small">
-                    <i class="fas fa-star fa-s"></i>
-                  </span>
-                </label>
-                <label class="radio">
-                  <input type="radio" name="rating" value="3" onclick="ratings(this, ${bookId})">
-                  <span class="icon is-small">
-                    <i class="fas fa-star fa-s"></i>
-                  </span>
-                </label>
-                <label class="radio">
-                  <input type="radio" name="rating" value="4" onclick="ratings(this, ${bookId})">
-                  <span class="icon is-small">
-                    <i class="fas fa-star fa-s"></i>
-                  </span>
-                </label>
-                <label class="radio">
-                  <input type="radio" name="rating" value="5" onclick="ratings(this, ${bookId})">
-                  <span class="icon is-small">
-                    <i class="fas fa-star fa-s"></i>
-                  </span>
-                </label>
-                <div><span><b>Average rating: ${ratingAvg[i]}</b></span></div>
-              </div>
-            </div>
-        </div>
-          </div>
-        </div>
-        
-      </div>
-      `;
-
+      div.innerHTML = savedBooksCard(image, title, author, pages, releaseDate, bookId, savedRatingAvg, i);
       saveBooksList.append(div);
+    });
+
+    // Get the selected value from the dropdown menu
+    // let dropdownValue = document.querySelector(".dropdown-trigger").getAttribute("data-value");
+    if (dropdownValue === "0") {
+      ratedBooks = reviews.map((review) => review.book);
+    } else if (dropdownValue === "1") {
+      // Sort the rated books by title
+      ratedBooks = ratedBooks.slice().sort((a, b) => a.title.localeCompare(b.title));
+    } else if (dropdownValue === "2") {
+      // Sort the rated books by rating (highest to lowest)
+      ratedBooks = reviews
+        .slice()
+        .sort((a, b) => b.rating - a.rating)
+        .map((review) => review.book);
+    } else if (dropdownValue === "3") {
+      ratedBooks = ratedBooks.slice().sort((a, b) => b.title.localeCompare(a.title));
+    } else if (dropdownValue === "4") {
+      ratedBooks = reviews
+        .slice()
+        .sort((a, b) => a.rating - b.rating)
+        .map((review) => review.book);
+    }
+
+    ratedBooks.forEach((book, i) => {
+      let { title, pages, author, releaseDate, coverImage, id } = book;
+      let bookId = id;
+      const image = coverImage.url;
+      let div = document.createElement("div");
+      div.classList.add("box");
+      div.innerHTML = ratedBooksCard(image, title, author, pages, releaseDate, bookId, ratedRatingAvg, i);
+      ratedBooksList.append(div);
     });
 
     if (saveBooksList.innerHTML === "") {
@@ -621,7 +756,6 @@ async function renderProfile() {
 
     saveBtn();
     ratingBtns();
-    // averageRating2();
   } else if (!sessionStorage.getItem("token")) {
     if (saveBooksList.innerHTML === "") {
       let p = document.createElement("p");
@@ -629,6 +763,11 @@ async function renderProfile() {
       saveBooksList.append(p);
     }
   }
+}
+async function getProfile() {
+  let user = await getUserInfo();
+  printProfile(user);
+  dropDownActive(user);
 }
 
 /* FETCHES WITH AXIOS */
@@ -644,7 +783,7 @@ async function loadPage() {
   // await getUserInfo();
   removeLoginBtns();
   if (document.querySelector("#profile-card")) {
-    renderProfile();
+    getProfile();
   }
   if (document.querySelector("#book-cards")) {
     loadBooks();
@@ -707,4 +846,24 @@ async function getUserInfo() {
   }
 }
 
+/* CHANGE THEME */
+
+async function getTheme() {
+  let theme = await getItems("http://localhost:1337/api/change-theme");
+  let themeBool = theme.data.data.attributes.toggleTheme;
+  console.log(themeBool);
+  toggleColor(themeBool);
+}
+
+function toggleColor(isDarkMode) {
+  const themeStyle = document.getElementById("theme-style");
+  if (!isDarkMode) {
+    themeStyle.href = "style_main_theme.css";
+  } else {
+    themeStyle.href = "style_dark_theme.css";
+  }
+}
+
+/* LOAD PAGE */
+getTheme();
 loadPage();

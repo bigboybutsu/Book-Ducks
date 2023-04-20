@@ -38,6 +38,7 @@ if (loginForm) {
 }
 
 function validateLoginForm() {
+  //Checks if the login is empty and warns the user if thats the case
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
@@ -53,6 +54,8 @@ function validateLoginForm() {
 }
 
 function validateRegisterForm() {
+  //Checks if the register is empty and warns the user if thats the case
+
   const username = document.querySelector("#regUsername").value;
   const email = document.querySelector("#regEmail").value;
   const password = document.querySelector("#regPassword").value;
@@ -70,18 +73,19 @@ function validateRegisterForm() {
 
 if (signupBtn) {
   signupBtn.addEventListener("click", (event) => {
-    event.preventDefault(); // prevent the default behavior of the link
+    event.preventDefault();
     window.location.href = "./log-in.html?signup=true"; // redirect to log-in.html with a query parameter
   });
 }
 
 function printSignup() {
+  // Takes the queryparameter from if(signupBtn)
   const queryParams = new URLSearchParams(window.location.search);
   if (queryParams.get("signup") === "true") {
     if (loginContainer) {
       loginContainer.classList.toggle("hidden");
     }
-
+    //Adds the signup box
     let main = document.querySelector("main");
     let div = document.createElement("div");
     div.classList.add("center");
@@ -124,16 +128,19 @@ function printSignup() {
     registerForm.addEventListener("submit", async function (event) {
       event.preventDefault();
       let password = document.querySelector("#regPassword").value;
-
+      // Only does a post to the API if the password is longer than 6 letters
       if (password.length >= 6) {
         await signUpUser();
       }
     });
   }
 }
+//Loads printSignup if the queryparameter is met
 window.addEventListener("load", printSignup);
 
 function removeLoginBtns() {
+  //If the user is logged in it removes the login and signup buttons
+  // and replaces it with a sign out button and the username
   if (sessionStorage.getItem("token")) {
     let loginBtn = document.querySelector("#loginBtn");
     let signupBtn = document.querySelector("#signupBtn");
@@ -168,6 +175,7 @@ function removeLoginBtns() {
 /* SAVE BOOKS */
 
 async function toggleSaved(bookId, save) {
+  // Saves/Removes the book from/to the API depending on if the button that has been clicked was in the save or saved state
   const userId = sessionStorage.getItem("userId");
   const authToken = sessionStorage.getItem("token");
 
@@ -198,10 +206,12 @@ async function toggleSaved(bookId, save) {
   );
 
   updateSaveBtn(bookId, save);
-  // console.log(updateUserResponse.data);
 }
 
 function updateSaveBtn(bookId, save) {
+  // Changes the save button from saved to save depending on if it has been click
+  // and calls the toggleSaved function to send it to the backend.
+  // Also checks if ratedBtn exists which only exists on the profile page
   let ratedBtn = document.querySelector(`#rated_saveBtn_${bookId}`);
   let saveBtn = document.querySelector(`#saveBtn_${bookId}`);
 
@@ -229,11 +239,11 @@ function updateSaveBtn(bookId, save) {
 }
 
 async function saveBtn() {
+  // Starts the chain of saveBtns
   let userData = await getUserInfo();
   if (userData != undefined) {
     const userBooks = userData.books;
     let userBooksIds = userBooks.map((book) => book.id);
-    // console.log(userBooksIds);
     userBooksIds.forEach((bookId) => {
       updateSaveBtn(bookId, true);
     });
@@ -243,6 +253,7 @@ async function saveBtn() {
 /* LOAD BOOKS */
 
 async function ratings(el, bookId) {
+  // Changes the review or adds it to the user
   changeStarColor(el);
   const ratingValue = el.value;
 
@@ -258,7 +269,6 @@ async function ratings(el, bookId) {
   const userReviews = userResponse.data.reviews || []; // get the user's existing reviews, or an empty array if they don't have any
 
   const existingReview = userReviews.find((review) => review.book.id === bookId);
-  // console.log(existingReview);
 
   if (existingReview) {
     // user has already left a review for this book, update the existing review
@@ -273,7 +283,6 @@ async function ratings(el, bookId) {
         Authorization: `Bearer ${authToken}`,
       },
     });
-    // console.log(updateReviewResponse.data);
   } else {
     // user has not left a review for this book, create a new review
     const newReview = {
@@ -288,11 +297,11 @@ async function ratings(el, bookId) {
         Authorization: `Bearer ${authToken}`,
       },
     });
-    console.log(createReviewResponse);
   }
 }
 
 function changeStarColor(el) {
+  // Changes the color of the clicked star and all stars before it in the same div.
   // Get all the radio inputs in the group
   var inputs = el.parentNode.parentNode.querySelectorAll("input[type='radio']");
 
@@ -311,6 +320,7 @@ function changeStarColor(el) {
 }
 
 function averageRating(bookArray) {
+  // Checks the average rating for each book.
   let totalAvg = [];
   bookArray.forEach((book, i) => {
     const { reviews: review } = book;
@@ -331,11 +341,9 @@ function averageRating(bookArray) {
 
 async function ratingBtns() {
   let userData = await getUserInfo();
-  // console.log(userData);
-
+  // Fills the stars to what the user has rated them if they have given a rating. Otherwise leaves it blank.
   const userReviews = userData.reviews;
   if (userData != undefined) {
-    let userId = parseInt(sessionStorage.getItem("userId"));
     if (document.querySelector("#book-cards")) {
       userReviews.forEach((review) => {
         const reviewRating = review.rating;
@@ -364,6 +372,7 @@ async function ratingBtns() {
 }
 
 function bookDivStructure(image, title, author, pages, releaseDate, bookId, ratingAvg) {
+  // Creates the book card on the home page
   let div = document.createElement("div");
   div.classList.add("column");
   if (sessionStorage.getItem("token")) {
@@ -450,6 +459,7 @@ function bookDivStructure(image, title, author, pages, releaseDate, bookId, rati
 }
 
 function bookRender(books, auth) {
+  // Gets all info for the books via an API call and calculates rating or not depending on if the user is logged in
   if (auth) {
     const {
       attributes: { title: title, pages: pages, author: author, releaseDate: releaseDate, coverImage: coverImage, reviews: review },
@@ -484,6 +494,7 @@ function bookRender(books, auth) {
 }
 
 function renderColumns(card, index) {
+  //Appends each card to 2 for each row
   if (index % 2 === 0) {
     // create new row for every even-numbered index
     const row = document.createElement("div");
@@ -499,6 +510,7 @@ function renderColumns(card, index) {
 }
 
 async function loadBooks() {
+  // Loads all books via an API call and sends that info with a boolean to bookRender and renderColumns
   let authBooksArr;
   let publicBooksArr;
   if (sessionStorage.getItem("token")) {
@@ -526,11 +538,11 @@ async function loadBooks() {
   saveBtn();
   ratingBtns();
 }
-// averageRating();
 
 /* PROFILE PAGE */
 
 function savedBooksCard(image, title, author, pages, releaseDate, bookId, ratingAvg, i) {
+  // Generates a savedBook
   let div = `
   <div class="list-item">
     <div class="columns">
@@ -600,6 +612,7 @@ function savedBooksCard(image, title, author, pages, releaseDate, bookId, rating
   return div;
 }
 function ratedBooksCard(image, title, author, pages, releaseDate, bookId, ratingAvg, i) {
+  // Generates a ratedBook
   let div = `
   <div class="list-item">
     <div class="columns">
@@ -694,6 +707,7 @@ function dropDownActive(user) {
 }
 
 function printProfile(user, dropdownValue) {
+  // Prints the entire profile and sorts the ratedArray depending on the dropdown value
   let saveBooksList = document.querySelector("#savedBooks-list");
   let ratedBooksList = document.querySelector("#ratedBooks-list");
   if (sessionStorage.getItem("token")) {
@@ -717,14 +731,11 @@ function printProfile(user, dropdownValue) {
     });
 
     // Get the selected value from the dropdown menu
-    // let dropdownValue = document.querySelector(".dropdown-trigger").getAttribute("data-value");
     if (dropdownValue === "0") {
       ratedBooks = reviews.map((review) => review.book);
     } else if (dropdownValue === "1") {
-      // Sort the rated books by title
       ratedBooks = ratedBooks.slice().sort((a, b) => a.title.localeCompare(b.title));
     } else if (dropdownValue === "2") {
-      // Sort the rated books by rating (highest to lowest)
       ratedBooks = reviews
         .slice()
         .sort((a, b) => b.rating - a.rating)
@@ -764,7 +775,9 @@ function printProfile(user, dropdownValue) {
     }
   }
 }
+
 async function getProfile() {
+  // Gets profile info and sends it to relevant functions
   let user = await getUserInfo();
   printProfile(user);
   dropDownActive(user);
@@ -773,14 +786,14 @@ async function getProfile() {
 /* FETCHES WITH AXIOS */
 
 async function getItems(url) {
+  // Gets whatever item from the api the url is
+  // Should have used this more but didn't for some reason
   let response = await axios.get(url);
   return response;
 }
 
 async function loadPage() {
-  // Testa att flytta in getUserInfo in i getUserLoginAuth och se om du kan permanent-
-  // spara datan där.
-  // await getUserInfo();
+  // Starts a chain of functions depending on if the user is on the profile page or home page
   removeLoginBtns();
   if (document.querySelector("#profile-card")) {
     getProfile();
@@ -791,6 +804,7 @@ async function loadPage() {
 }
 
 async function signUpUser() {
+  // Registers a new user to the API
   const username = document.querySelector("#regUsername").value;
   const email = document.querySelector("#regEmail").value;
   const password = document.querySelector("#regPassword").value;
@@ -817,6 +831,7 @@ async function signUpUser() {
 }
 
 async function getUserLoginAuth(username, password) {
+  // Logs in a user
   try {
     let response = await axios.post("http://localhost:1337/api/auth/local", {
       identifier: username,
@@ -836,6 +851,7 @@ async function getUserLoginAuth(username, password) {
 }
 
 async function getUserInfo() {
+  // Gets user info, used in some specific functions to read the user data
   if (sessionStorage.getItem("token")) {
     let response = await axios.get("http://localhost:1337/api/users/me?populate=deep,4", {
       headers: {
@@ -849,15 +865,16 @@ async function getUserInfo() {
 /* CHANGE THEME */
 
 async function getTheme() {
+  // Gets theme boolean
   let theme = await getItems("http://localhost:1337/api/change-theme");
   let themeBool = theme.data.data.attributes.toggleTheme;
-  console.log(themeBool);
   toggleColor(themeBool);
 }
 
-function toggleColor(isDarkMode) {
+function toggleColor(changeTheme) {
+  // Changes css file depending on the boolean state
   const themeStyle = document.getElementById("theme-style");
-  if (!isDarkMode) {
+  if (!changeTheme) {
     themeStyle.href = "style_main_theme.css";
   } else {
     themeStyle.href = "style_dark_theme.css";

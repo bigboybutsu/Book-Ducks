@@ -342,31 +342,33 @@ function averageRating(bookArray) {
 async function ratingBtns() {
   let userData = await getUserInfo();
   // Fills the stars to what the user has rated them if they have given a rating. Otherwise leaves it blank.
-  const userReviews = userData.reviews;
-  if (userData != undefined) {
-    if (document.querySelector("#book-cards")) {
-      userReviews.forEach((review) => {
-        const reviewRating = review.rating;
-        const bookId = review.book.id;
-        let parentNode = document.querySelector(`#book_${bookId}_ratings`);
-        let input = parentNode.querySelector(`input[value='${reviewRating}']`);
-        changeStarColor(input);
-      });
-    } else if (document.querySelector("#profile-card")) {
-      userReviews.forEach((review) => {
-        const reviewRating = review.rating;
-        const bookId = review.book.id;
-        let parentNodeSaved = document.querySelector(`#book_${bookId}_ratings`);
-        let parentNodeRated = document.querySelector(`#rated_book_${bookId}_ratings`);
-        if (parentNodeSaved) {
-          let input = parentNodeSaved.querySelector(`input[value='${reviewRating}']`);
+  if (sessionStorage.getItem("token")) {
+    const userReviews = userData.reviews;
+    if (userData != undefined) {
+      if (document.querySelector("#book-cards")) {
+        userReviews.forEach((review) => {
+          const reviewRating = review.rating;
+          const bookId = review.book.id;
+          let parentNode = document.querySelector(`#book_${bookId}_ratings`);
+          let input = parentNode.querySelector(`input[value='${reviewRating}']`);
           changeStarColor(input);
-        }
-        if (parentNodeRated) {
-          let input = parentNodeRated.querySelector(`input[value='${reviewRating}']`);
-          changeStarColor(input);
-        }
-      });
+        });
+      } else if (document.querySelector("#profile-card")) {
+        userReviews.forEach((review) => {
+          const reviewRating = review.rating;
+          const bookId = review.book.id;
+          let parentNodeSaved = document.querySelector(`#book_${bookId}_ratings`);
+          let parentNodeRated = document.querySelector(`#rated_book_${bookId}_ratings`);
+          if (parentNodeSaved) {
+            let input = parentNodeSaved.querySelector(`input[value='${reviewRating}']`);
+            changeStarColor(input);
+          }
+          if (parentNodeRated) {
+            let input = parentNodeRated.querySelector(`input[value='${reviewRating}']`);
+            changeStarColor(input);
+          }
+        });
+      }
     }
   }
 }
@@ -611,6 +613,7 @@ function savedBooksCard(image, title, author, pages, releaseDate, bookId, rating
   `;
   return div;
 }
+
 function ratedBooksCard(image, title, author, pages, releaseDate, bookId, ratingAvg, i) {
   // Generates a ratedBook
   let div = `
@@ -867,7 +870,7 @@ async function getUserInfo() {
 async function getTheme() {
   // Gets theme boolean
   let theme = await getItems("http://localhost:1337/api/change-theme");
-  let themeBool = theme.data.data.attributes.toggleTheme;
+  let themeBool = theme.data.data.attributes.darkmodeTheme;
   toggleColor(themeBool);
 }
 
